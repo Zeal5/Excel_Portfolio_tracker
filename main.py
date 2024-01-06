@@ -1,9 +1,6 @@
 import pandas as pd
 from pprint import pprint
 
-# import xlsxwriter
-
-
 class TickerData:
     def __init__(self, ticker: str):
         self.ticker = ticker
@@ -98,8 +95,12 @@ def main():
     # print(new_df)
     # # new_df.to_excel("Book2.xlsx", sheet_name = "summary")
     print(new_df)
+    new_df = new_df.reindex(columns=['ticker', 'qty', 'qty_sold', 'average_buy_price', 'average_sell_price', 'breakeven_price', 'total_cost', 'total_profit'])
+
+    new_df.loc[new_df['breakeven_price'] == 0, 'breakeven_price'] = new_df['average_buy_price']  
+
     with pd.ExcelWriter('Book2.xlsx', mode='a',engine="openpyxl", if_sheet_exists="overlay") as writer:
-       new_df.to_excel(writer, sheet_name='summary',header= False,index=False, startrow= 1)
+       new_df.to_excel(writer, sheet_name='summary',index=False)
     print('done')
 
 
