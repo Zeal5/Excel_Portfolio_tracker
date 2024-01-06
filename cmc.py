@@ -1,6 +1,5 @@
-import asyncio, aiohttp, os
+import aiohttp, os
 from dotenv import load_dotenv
-from pprint import pprint
 
 load_dotenv()
 
@@ -22,5 +21,4 @@ async def get_data(ticker_list : list) :
             return prices
 
 
-asyncio.run(get_data(['BTC','ETH']))
 

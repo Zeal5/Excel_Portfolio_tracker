@@ -1,5 +1,7 @@
 import pandas as pd
 from pprint import pprint
+import asyncio
+from cmc import get_data
 
 class TickerData:
     def __init__(self, ticker: str):
@@ -46,7 +48,7 @@ def calculate_average(_ticker: str, _df: pd.DataFrame) -> dict:
             ticker.calc_break_even_price(_price, _amount)
 
     summary = {
-        "ticker": ticker.ticker,
+        "ticker": ticker.ticker.upper(),
         "average_buy_price": ticker.avg_buy_price,
         "average_sell_price": ticker.avg_sell_price,
         "breakeven_price": ticker.breakeven_price,
@@ -64,15 +66,15 @@ def load_excel(_sheet_name: str):
     df.columns = df.columns.str.lower()
     df = df.map(lambda x: x.strip().lower() if type(x) == str else x)
     df = df.dropna()
-    print(df)
-    print("-" * 50)
+    # print(df)
+    # print("-" * 50)
     return df
 
 
 def get_unique_ticker(_df: pd.DataFrame) -> set:
     """Return unique tickers from dataframe"""
     tickers = {i.lower().strip() for i in _df["ticker"].tolist()}
-    print(tickers)
+    # print(tickers)
     return tickers
 
 
@@ -83,21 +85,22 @@ def main():
     summary_dict = {}
     for ticker in unique_tickers:
         """Seperate rows for each ticker into df"""
-        # print(ticker)
         df_ticker = df.loc[df["ticker"] == ticker]
-        # print(df_ticker)
         summary_dict[ticker] = calculate_average(ticker, df_ticker)
 
-    # pprint(summary_dict, indent =3)
     new_df = pd.DataFrame(summary_dict)
     new_df = new_df.transpose()
-    # new_df.drop(new_df.index[0], inplace=True)
-    # print(new_df)
-    # # new_df.to_excel("Book2.xlsx", sheet_name = "summary")
-    print(new_df)
-    new_df = new_df.reindex(columns=['ticker', 'qty', 'qty_sold', 'average_buy_price', 'average_sell_price', 'breakeven_price', 'total_cost', 'total_profit'])
-
+    # breakeven price == average buy price if B/E is 0 
     new_df.loc[new_df['breakeven_price'] == 0, 'breakeven_price'] = new_df['average_buy_price']  
+
+    prices = asyncio.run(get_data(list(unique_tickers)))
+    print(prices)
+    new_df['market_price'] = new_df['ticker'].map(prices).round(9)
+    new_df['market_value'] = new_df['market_price'] * new_df['qty']
+    new_df['unrealized'] = new_df['market_value'] - new_df['total_cost']
+    print(new_df)
+
+    new_df = new_df.reindex(columns=['ticker', 'qty', 'qty_sold', 'average_buy_price', 'average_sell_price', 'breakeven_price', 'total_cost', 'total_profit', 'market_price','market_value', 'unrealized'])
 
     with pd.ExcelWriter('Book2.xlsx', mode='a',engine="openpyxl", if_sheet_exists="overlay") as writer:
        new_df.to_excel(writer, sheet_name='summary',index=False)
