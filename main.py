@@ -103,7 +103,7 @@ def main():
     new_df = new_df.reindex(columns=['ticker', 'qty', 'qty_sold', 'average_buy_price', 'average_sell_price', 'breakeven_price', 'total_cost', 'total_profit', 'market_price','market_value', 'unrealized'])
 
     with pd.ExcelWriter('Book2.xlsx', mode='a',engine="openpyxl", if_sheet_exists="overlay") as writer:
-       new_df.to_excel(writer, sheet_name='summary',index=False)
+       new_df.to_excel(writer, sheet_name='summary2',index=False)
     print('done')
 
 
