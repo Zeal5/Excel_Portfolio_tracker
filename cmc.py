@@ -16,7 +16,11 @@ async def get_data(ticker_list : list) :
             data = res['data'] 
             prices = {}
             for ticker,_data_list in data.items():
-                prices[ticker] = _data_list[0]['quote']['USD']['price']
+                try:
+                    prices[ticker] = _data_list[0]['quote']['USD']['price']
+                except Exception as e:
+                    print(f"{ticker} Got an error {str(e)}")
+                    prices[ticker] = 0
 
             return prices
 

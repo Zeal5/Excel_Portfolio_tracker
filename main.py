@@ -2,6 +2,7 @@ import pandas as pd
 from pprint import pprint
 import asyncio
 from cmc import get_data
+from . import readCSV
 
 class TickerData:
     def __init__(self, ticker: str):
@@ -61,13 +62,14 @@ def calculate_average(_ticker: str, _df: pd.DataFrame) -> dict:
 
 
 def load_excel(_sheet_name: str):
-    xl = pd.ExcelFile(_sheet_name)
-    df = xl.parse("Sheet1")
-    df.columns = df.columns.str.lower()
-    df = df.map(lambda x: x.strip().lower() if type(x) == str else x)
-    df = df.dropna()
+    # xl = pd.ExcelFile(_sheet_name)
+    # df = xl.parse("Sheet1")
+    # df.columns = df.columns.str.lower()
+    # df = df.map(lambda x: x.strip().lower() if type(x) == str else x)
+    # df = df.dropna()
     # print(df)
     # print("-" * 50)
+    read_csv("binance.xlsx", "gateio.csv")
     return df
 
 
@@ -103,7 +105,7 @@ def main():
     new_df = new_df.reindex(columns=['ticker', 'qty', 'qty_sold', 'average_buy_price', 'average_sell_price', 'breakeven_price', 'total_cost', 'total_profit', 'market_price','market_value', 'unrealized'])
 
     with pd.ExcelWriter('Book2.xlsx', mode='a',engine="openpyxl", if_sheet_exists="overlay") as writer:
-       new_df.to_excel(writer, sheet_name='summary2',index=False)
+       new_df.to_excel(writer, sheet_name='summary',index=False)
     print('done')
 
 
