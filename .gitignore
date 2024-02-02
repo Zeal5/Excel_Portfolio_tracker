@@ -2,3 +2,6 @@ Book1.xlsx
 Book2.xlsx
 .env
 backup/
+__pycache__
+binance.xlsx
+gateio.csv
