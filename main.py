@@ -2,7 +2,7 @@ import pandas as pd
 from pprint import pprint
 import asyncio
 from cmc import get_data
-from . import readCSV
+from readCSV import read_csv
 
 class TickerData:
     def __init__(self, ticker: str):
@@ -23,7 +23,10 @@ class TickerData:
         self.holdings += _amount
         self.total_cost += price * _amount
         # print(f"amount {self.holdings}\ttotal cost : {self.total_cost}")
-        self.avg_buy_price = self.total_cost / self.holdings
+        try:
+            self.avg_buy_price = self.total_cost / self.holdings
+        except Exception as e:
+            self.avg_buy_price = 0 
 
     def calc_break_even_price(self, _price: float, _amount_sold: float):
         self.holdings -= _amount_sold
@@ -69,7 +72,7 @@ def load_excel(_sheet_name: str):
     # df = df.dropna()
     # print(df)
     # print("-" * 50)
-    read_csv("binance.xlsx", "gateio.csv")
+    df = read_csv("binance.xlsx", "gateio.csv")
     return df
 
 

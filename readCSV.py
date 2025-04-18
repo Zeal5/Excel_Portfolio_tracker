@@ -55,8 +55,9 @@ def read_binance_orders(_file_path:str) ->pd.DataFrame:
 def read_csv(_binance_path:str, _gateio_path : str)-> pd.DataFrame:
     gateio = read_gateio_orders(_gateio_path)
     binance = read_binance_orders(_binance_path)
-    merger = pd.concat([gateio, binance])
-    print(merger)
+    merger = pd.concat([gateio, binance],ignore_index=True)
+    # pd.set_option('display.max_rows', None)
+    # print(merger)
     return merger
 
 
